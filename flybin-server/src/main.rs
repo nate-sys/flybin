@@ -1,7 +1,7 @@
 use std::{net::SocketAddr, sync::Arc};
 
 
-use paste::Paste;
+use flybin_common::paste::Paste;
 
 use sqlx::SqlitePool;
 
@@ -14,7 +14,6 @@ use tracing::{debug, info};
 use tracing_subscriber::prelude::*;
 
 mod error;
-mod paste;
 mod server;
 
 #[tokio::main]

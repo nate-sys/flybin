@@ -3,7 +3,6 @@ use std::{collections::HashMap, fmt, str::FromStr, sync::Arc, time::Duration};
 use serde::{de, Deserialize, Deserializer};
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 
-use crate::paste::Paste;
 use axum::{
     error_handling::HandleErrorLayer,
     extract::{FromRef, MatchedPath, Path, Query, State},
@@ -12,6 +11,7 @@ use axum::{
     routing::{delete, get, post},
     BoxError, Router,
 };
+use flybin_common::paste::Paste;
 use sqlx::SqlitePool;
 use syntect::{
     easy::HighlightLines,
@@ -201,13 +201,18 @@ async fn lock_paste(
         "Missing secret".to_string(),
     ))?;
 
-    Paste::lock(&slug, secret, password, &pool).await?;
-
-    Ok((
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "text/plain")],
-        format!("paste({}) successfully locked", slug),
-    ))
+    if Paste::lock(&slug, secret, password, &pool).await? == 0 {
+        Err(AppError(
+            StatusCode::NOT_FOUND,
+            "paste not found".to_string(),
+        ))
+    } else {
+        Ok((
+            StatusCode::OK,
+            [(header::CONTENT_TYPE, "text/plain")],
+            format!("paste({}) successfully locked", slug),
+        ))
+    }
 }
 
 #[axum::debug_handler]
@@ -224,15 +229,20 @@ async fn delete_paste(
         ))?
         .to_string();
 
-    Paste::delete(&slug, secret, &pool).await?;
-
-    Ok((
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "text/plain")],
-        format!(
-            "Post successfully deleted http://{}:8080/{}\n",
-            dotenvy::var("HOST").unwrap(),
-            slug
-        ),
-    ))
+    if Paste::delete(&slug, secret, &pool).await? == 0 {
+        Err(AppError(
+            StatusCode::NOT_FOUND,
+            "paste not found".to_string(),
+        ))
+    } else {
+        Ok((
+            StatusCode::OK,
+            [(header::CONTENT_TYPE, "text/plain")],
+            format!(
+                "Post successfully deleted http://{}:8080/{}\n",
+                dotenvy::var("HOST").unwrap(),
+                slug
+            ),
+        ))
+    }
 }

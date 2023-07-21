@@ -478,6 +478,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "flybin-common"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "chrono",
+ "dotenvy",
+ "nanoid",
+ "sqlx",
+]
+
+[[package]]
 name = "flybin-server"
 version = "0.1.0"
 dependencies = [
@@ -486,6 +497,7 @@ dependencies = [
  "blake3",
  "chrono",
  "dotenvy",
+ "flybin-common",
  "nanoid",
  "serde",
  "sqlx",

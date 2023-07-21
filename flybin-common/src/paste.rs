@@ -1,7 +1,4 @@
-use axum::http::StatusCode;
 use sqlx::{FromRow, Pool, Sqlite};
-
-use crate::error::AppError;
 
 #[derive(FromRow, Debug)]
 pub struct Paste {
@@ -71,9 +68,9 @@ Expires at: {}
         secret: String,
         password: String,
         pool: &Pool<Sqlite>,
-    ) -> Result<(), AppError> {
+    ) -> Result<u64, sqlx::Error> {
         let password = blake3::hash(password.as_bytes()).to_string();
-        let rows_affected = sqlx::query!(
+        Ok(sqlx::query!(
             r#"
                 UPDATE pastes 
                 SET password = $1 
@@ -85,16 +82,7 @@ Expires at: {}
         )
         .execute(pool)
         .await?
-        .rows_affected();
-
-        if rows_affected == 0 {
-            Err(AppError(
-                StatusCode::NOT_FOUND,
-                "unable to lock paste".to_string(),
-            ))
-        } else {
-            Ok(())
-        }
+        .rows_affected())
     }
 
     pub async fn get(
@@ -117,23 +105,19 @@ Expires at: {}
         .await
     }
 
-    pub async fn delete(slug: &str, secret: String, pool: &Pool<Sqlite>) -> Result<(), AppError> {
-        let rows_deleted = sqlx::query!(
+    pub async fn delete(
+        slug: &str,
+        secret: String,
+        pool: &Pool<Sqlite>,
+    ) -> Result<u64, sqlx::Error> {
+        Ok(sqlx::query!(
             "DELETE FROM pastes WHERE slug = $1 AND secret = $2",
             slug,
             secret,
         )
         .execute(pool)
-        .await?;
-
-        if rows_deleted.rows_affected() == 0 {
-            return Err(AppError(
-                StatusCode::UNAUTHORIZED,
-                "unable to delete paste".to_string(),
-            ));
-        }
-
-        Ok(())
+        .await?
+        .rows_affected())
     }
 }
 

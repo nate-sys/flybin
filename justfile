@@ -31,7 +31,7 @@ getlang LANG SLUG *PASSARGS:
 
 # delete a paste : just delete MySlug MySecretToken
 delete SLUG SECRET :
-    curl -X delete -G \
+    curl -X DELETE -G \
         -d "secret={{SECRET}}" \
         http://{{host}}:{{http-port}}/{{SLUG}}
 
