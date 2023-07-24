@@ -1,6 +1,5 @@
 use std::{net::SocketAddr, sync::Arc};
 
-
 use flybin_common::paste::Paste;
 
 use sqlx::SqlitePool;
@@ -28,7 +27,12 @@ async fn main() -> anyhow::Result<()> {
 
     let cloned_pool = pool.clone();
     tokio::spawn(async move {
-        let listener = TcpListener::bind("0.0.0.0:9999").await.unwrap();
+        let listener = TcpListener::bind(format!(
+            "0.0.0.0:{}",
+            dotenvy::var("FLYBIN_TCP_PORT").unwrap_or("9999".into())
+        ))
+        .await
+        .unwrap();
         loop {
             let (stream, addr) = listener.accept().await.unwrap();
             tokio::spawn(handle_connection(stream, addr, cloned_pool.clone()));
@@ -45,7 +49,13 @@ async fn handle_connection(
     pool: Arc<SqlitePool>,
 ) -> anyhow::Result<()> {
     info!("Accepted connection from {}", addr.ip());
-    let mut buf = vec![0; 4096];
+    let mut buf = vec![
+        0;
+        dotenvy::var("FLYBIN_MAX_BYTES")
+            .unwrap_or("4096".into())
+            .parse()
+            .unwrap()
+    ];
     let bytes_read = stream.read(&mut buf).await?;
 
     let paste = Paste::new(

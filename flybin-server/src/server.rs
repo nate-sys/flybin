@@ -106,9 +106,16 @@ pub async fn run(pool: Arc<SqlitePool>) -> anyhow::Result<()> {
         )
         .with_state(app_state);
 
-    axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
-        .serve(app.into_make_service())
-        .await?;
+    axum::Server::bind(
+        &format!(
+            "0.0.0.0:{}",
+            dotenvy::var("FLYBIN_HTTP_PORT").unwrap_or("8080".into())
+        )
+        .parse()
+        .unwrap(),
+    )
+    .serve(app.into_make_service())
+    .await?;
 
     Ok(())
 }
