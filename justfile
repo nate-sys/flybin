@@ -1,9 +1,10 @@
-alias db := reset
-alias s := serve
-
 host := "localhost"
 http-port := "8080"
 nc-port := "9999"
+
+set dotenv-load
+db_url := trim_start_match(env_var("DATABASE_URL"), "sqlite:")
+
 
 # Rerun migrations 
 reset:
@@ -43,3 +44,11 @@ lock SLUG SECRET PASSWORD:
         -d "secret={{SECRET}}" \
         http://{{host}}:{{http-port}}/{{SLUG}}
 
+check_db:
+
+# create an admin : just admin username password
+admin USERNAME PASSWORD:
+    #!/usr/bin/env bash
+    pass_hash=$(botan gen_argon2 {{PASSWORD}})
+    sqlite3 {{db_url}} \
+        "insert into admins (username, password) values ('{{USERNAME}}', '${pass_hash}');"
