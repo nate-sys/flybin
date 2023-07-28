@@ -49,6 +49,6 @@ check_db:
 # create an admin : just admin username password
 admin USERNAME PASSWORD:
     #!/usr/bin/env bash
-    pass_hash=$(botan gen_argon2 {{PASSWORD}})
+    pass_hash=$(botan gen_argon2 --t=3 --p=4 {{PASSWORD}})
     sqlite3 {{db_url}} \
         "insert into admins (username, password) values ('{{USERNAME}}', '${pass_hash}');"

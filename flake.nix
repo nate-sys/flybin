@@ -15,6 +15,7 @@
             cargo
             gcc
             just
+            netcat-gnu
             nodePackages.pnpm
             nodejs_18
             rustc

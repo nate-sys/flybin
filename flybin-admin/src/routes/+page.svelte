@@ -4,14 +4,22 @@
 	export let data: PageData;
 </script>
 
-{#await data.posts.loaded}
+<nav>
+	<h3>Pastes</h3>
+    <form method="POST">
+        <button>Logout</button>
+    </form>
+</nav>
+{#await data.pastes.loaded}
 	<p>loading...</p>
 {:then loaded}
 	<ul>
-		{#each loaded as post}
+		{#each loaded as pastes}
 			<li>
-				<Paste {...post} />
+				<Paste {...pastes} />
 			</li>
+		{:else}
+			<p>no pastes</p>
 		{/each}
 	</ul>
 {:catch error}
@@ -24,19 +32,19 @@
 	}
 	:global(body) {
 		font-family: sans-serif;
-        background: #0a023e;
-        color: #ffffff;
-        max-width: 80ch;
-        margin: auto;
+		background: #0a023e;
+		color: #ffffff;
+		max-width: 50ch;
+		margin: auto;
 	}
 	ul {
 		list-style: none;
 		padding: 0;
 	}
 	li:nth-child(even) {
-        background: #1a1a3a;
+		background: #1a1a3a;
 	}
 	li:nth-child(odd) {
-        background: #3a3264;
+		background: #3a3264;
 	}
 </style>
