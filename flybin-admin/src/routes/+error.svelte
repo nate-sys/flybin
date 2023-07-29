@@ -11,7 +11,7 @@
 		font-family: sans-serif;
 		background: #0a023e;
 		color: #ffffff;
-		max-width: 50ch;
+		max-width: 60ch;
 		margin: auto;
 	}
 	p {

@@ -44,7 +44,9 @@ lock SLUG SECRET PASSWORD:
         -d "secret={{SECRET}}" \
         http://{{host}}:{{http-port}}/{{SLUG}}
 
-check_db:
+# seed the pastebin with contents of files in the current dir
+seed:
+    fd -t f | while read -r file; do cat "$file" | nc {{host}} {{nc-port}} ; done
 
 # create an admin : just admin username password
 admin USERNAME PASSWORD:

@@ -34,9 +34,16 @@
 		font-family: sans-serif;
 		background: #0a023e;
 		color: #ffffff;
-		max-width: 50ch;
+		max-width: 60ch;
 		margin: auto;
 	}
+    :global( button ) {
+        appearance: none;
+        border: none;
+        background: #4a4b8b;
+        color: #fff;
+        padding: 1ch;
+    }
 	ul {
 		list-style: none;
 		padding: 0;

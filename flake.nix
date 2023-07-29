@@ -13,6 +13,8 @@
           buildInputs = with pkgs; [
             botan2
             cargo
+            curl
+            fd
             gcc
             just
             netcat-gnu
